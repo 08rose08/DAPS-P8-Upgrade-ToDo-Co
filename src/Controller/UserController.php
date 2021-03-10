@@ -42,8 +42,12 @@ class UserController extends AbstractController
             $em = $this->getDoctrine()->getManager();
             $password = $encoder->encodePassword($user, $user->getPassword());
             $user->setPassword($password);
-            $user->setRoles(['ROLE_USER']);
+            //$user->setRoles(['ROLE_USER']);
             //dd($user);
+            $role = array($form->get('roles')->getData());
+            //dd($role);
+            $user->setRoles($role);
+
             $em->persist($user);
             $em->flush();
 
@@ -64,9 +68,12 @@ class UserController extends AbstractController
 
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $password = $encoder->encodePassword($user, $user->getPassword());
             $user->setPassword($password);
+            
+            $role = array($form->get('roles')->getData());
+            $user->setRoles($role);
 
             $this->getDoctrine()->getManager()->flush();
 
