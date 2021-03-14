@@ -14,6 +14,7 @@
                     </h4>
                     <h4><a href="{{ path('task_edit', {'id' : task.id }) }}">{{ task.title }}</a></h4>
                     <p>{{ task.content }}</p>
+                    
                 </div>
                 <div>
                     <form action="{{ path('task_toggle', {'id' : task.id }) }}">
@@ -21,9 +22,14 @@
                             {% if not task.isDone %}Marquer comme faite{% else %}Marquer non terminée{% endif %}
                         </button>
                     </form>
-                    <form action="{{ path('task_delete', {'id' : task.id }) }}">
-                        <button class="btn btn-danger btn-sm pull-right">Supprimer</button>
-                    </form>
+                    {% if (task.user  == app.user) or (task.user.username == 'Anonyme' and app.user.roles == ['ROLE_ADMIN']) %}
+                        <form action="{{ path('task_edit', {'id' : task.id }) }}">
+                            <button class="btn btn-warning btn-sm pull-right">Modifier</button>
+                        </form>
+                        <form action="{{ path('task_delete', {'id' : task.id }) }}">
+                            <button class="btn btn-danger btn-sm pull-right">Supprimer</button>
+                        </form>
+                    {% endif %}
                 </div>
             </div>
         </div>

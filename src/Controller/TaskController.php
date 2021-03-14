@@ -56,7 +56,7 @@ class TaskController extends AbstractController
      */
     public function editAction(Task $task, Request $request)
     {
-        if($task->getUser() == $this->getUser()){
+        if($task->getUser() == $this->getUser() || ($task->getUser()->getUsername() == 'Anonyme' && $this->getUser()->getRoles() == ['ROLE_ADMIN'])){
             $form = $this->createForm(TaskType::class, $task);
 
             $form->handleRequest($request);
@@ -96,7 +96,7 @@ class TaskController extends AbstractController
      */
     public function deleteTaskAction(Task $task)
     {
-        if($task->getUser() == $this->getUser()){
+        if($task->getUser() == $this->getUser() || $this->getUser()->getRoles() == ['ROLE_ADMIN']){
             $em = $this->getDoctrine()->getManager();
             $em->remove($task);
             $em->flush();
