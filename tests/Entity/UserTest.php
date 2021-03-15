@@ -82,8 +82,6 @@ class UserTest extends KernelTestCase
     public function testRemoveTask()
     {
         $task = new Task;
-        $task->setTitle('TitleTest')
-            ->setContent('Le content test');
         $this->assertCount(1, $this->getEntity()->addTask($task)->getTasks());
         $this->assertCount(0, $this->getEntity()->removeTask($task)->getTasks());
     }
