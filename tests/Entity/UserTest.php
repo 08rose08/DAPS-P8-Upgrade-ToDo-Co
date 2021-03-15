@@ -82,8 +82,16 @@ class UserTest extends KernelTestCase
     public function testRemoveTask()
     {
         $task = new Task;
-        $this->assertCount(1, $this->getEntity()->addTask($task)->getTasks());
-        $this->assertCount(0, $this->getEntity()->removeTask($task)->getTasks());
+        $user = $this->getEntity();
+        $task->setUser($user);
+        $this->assertCount(1, $user->addTask($task)->getTasks());
+        $this->assertCount(0, $user->removeTask($task)->getTasks());
+        $this->assertSame(null, $task->getUser());
+    }
+
+    public function testSalt()
+    {
+        $this->assertSame(null, $this->getEntity()->getSalt());
     }
 
 
