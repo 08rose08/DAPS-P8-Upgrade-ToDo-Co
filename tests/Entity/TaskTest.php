@@ -6,7 +6,7 @@ use App\Entity\Task;
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-//use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolation;
 
 class TaskTest extends KernelTestCase
 {
@@ -21,8 +21,15 @@ class TaskTest extends KernelTestCase
     {
         self::bootKernel();
 
-        $error = self::$container->get('validator')->validate($task);
-        $this->assertCount($nb, $error);
+        $errors = self::$container->get('validator')->validate($task);
+        $messages = [];
+
+        /** @var ConstraintViolation $error */
+        foreach ($errors as $error) {
+            $messages[] = $error->getPropertyPath().' => '.$error->getMessage();
+        }
+
+        $this->assertCount($nb, $errors, implode(', ', $messages));
     }
 
     public function testValidEntity() 
