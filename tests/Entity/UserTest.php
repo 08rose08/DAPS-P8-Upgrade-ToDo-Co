@@ -29,8 +29,15 @@ class UserTest extends KernelTestCase
     {
         self::bootKernel();
 
-        $error = self::$container->get('validator')->validate($user);
-        $this->assertCount($nb, $error);
+        $errors = self::$container->get('validator')->validate($user);
+        $messages = [];
+        
+        /** @var ConstraintViolation $error */
+        foreach ($errors as $error) {
+            $messages[] = $error->getPropertyPath().' => '.$error->getMessage();
+        }
+
+        $this->assertCount($nb, $errors, implode(', ', $messages));
     }
 
     public function testValidEntity() 
