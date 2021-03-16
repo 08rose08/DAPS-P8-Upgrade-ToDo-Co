@@ -6,7 +6,7 @@ use App\Entity\Task;
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-//use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolation;
 
 class TaskTest extends KernelTestCase
 {
