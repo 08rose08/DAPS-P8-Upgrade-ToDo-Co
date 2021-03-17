@@ -4,6 +4,7 @@ namespace App\Tests\Controller;
 
 use App\Entity\User;
 use App\Tests\NeedLogin;
+use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -51,7 +52,6 @@ class SecurityControllerTest extends WebTestCase
 
         $this->assertResponseRedirects();
         $client->followRedirect();
-        //$this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $this->assertResponseIsSuccessful();
         $this->assertSelectorExists('.alert.alert-danger');
         $this->assertSelectorTextContains('button', 'Se connecter');
@@ -70,7 +70,6 @@ class SecurityControllerTest extends WebTestCase
 
         $this->assertResponseRedirects();
         $client->followRedirect();
-        //$this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $this->assertResponseIsSuccessful();
         $this->assertSelectorTextContains('h1', 'Bienvenue sur Todo List');
     }
@@ -78,7 +77,7 @@ class SecurityControllerTest extends WebTestCase
     public function testLinkLogout()
     {
         self::bootKernel();
-        $user = self::$container->get('doctrine')->getManager()->getRepository(User::class)->findOneBy(['username' => 'Anonyme']);
+        $user = self::$container->get(UserRepository::class)->findOneBy(['username' => 'Anonyme']);
         self::ensureKernelShutdown();
 
         $client = static::createClient();
