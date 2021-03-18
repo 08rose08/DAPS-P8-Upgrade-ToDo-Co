@@ -8,7 +8,6 @@ use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
@@ -23,7 +22,6 @@ class UserController extends AbstractController
 
     /**
      * @Route("/users", name="user_list")
-     * @IsGranted("ROLE_ADMIN")
      */
     public function listAction()
     {
@@ -55,7 +53,7 @@ class UserController extends AbstractController
 
             $this->addFlash('success', "L'utilisateur a bien été ajouté.");
 
-            return $this->redirectToRoute('task_list');
+            return $this->redirectToRoute('user_list');
         }
 
         return $this->render('user/create.html.twig', ['form' => $form->createView()]);
@@ -81,7 +79,7 @@ class UserController extends AbstractController
 
             $this->addFlash('success', "L'utilisateur a bien été modifié");
 
-            return $this->redirectToRoute('task_list');
+            return $this->redirectToRoute('user_list');
         }
 
         return $this->render('user/edit.html.twig', ['form' => $form->createView(), 'user' => $user]);
