@@ -144,6 +144,20 @@ class UserControllerTest extends WebTestCase
         $this->assertSelectorTextContains('button', 'Se connecter');
     }
 
+    public function testEditDisplayAsAdminTaskNotExist()
+    {
+        self::bootKernel();
+        $user = self::$container->get('doctrine')->getManager()->getRepository(User::class)->findOneBy(['username' => 'Admin']);
+        self::ensureKernelShutdown();
+
+        $client = static::createClient();
+
+        $this->loginUser($client, $user);
+
+        $client->request('GET', '/users/256/edit');
+        $this->assertTrue($client->getResponse()->isNotFound());
+    }
+
 
     // -----------------------Create-----------------------
 
