@@ -56,8 +56,9 @@ class TaskTest extends KernelTestCase
     {
         $this->assertSame(false, $this->getEntity()->isDone());
         $this->assertSame(true, $this->getEntity()->setIsDone(true)->isDone());
-        
-        //$this->assertSame(true, $this->getEntity()->toggle(true)->isDone());
+        $entity = $this->getEntity();
+        $entity->toggle(true);
+        $this->assertSame(true, $entity->isDone());
     }
     public function testCreatedAt()
     {
