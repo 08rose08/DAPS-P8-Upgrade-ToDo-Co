@@ -21,7 +21,7 @@ use Symfony\Component\Security\Guard\PasswordAuthenticatedInterface;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
 /**
- * @codeCoverageIgnore
+ * 
  */
 class AppAuthAuthenticator extends AbstractFormLoginAuthenticator implements PasswordAuthenticatedInterface
 {
