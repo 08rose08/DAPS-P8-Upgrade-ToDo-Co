@@ -190,6 +190,32 @@ class UserControllerTest extends WebTestCase
         //$this->assertSelectorTextContains('td', 'charlie');
     }
 
+    public function testCreateAsAdminEmptyForm()
+    {
+        self::bootKernel();
+        $user = self::$container->get('doctrine')->getManager()->getRepository(User::class)->findOneBy(['username' => 'Admin']);
+        self::ensureKernelShutdown();
+
+        $client = static::createClient();
+
+        $this->loginUser($client, $user);
+
+        $crawler = $client->request('GET', '/users/create');
+
+        $form = $crawler->selectButton('Ajouter')->form([
+            'user[username]' => '',
+            'user[password][first]' => '',
+            'user[password][second]' => '',
+            'user[email]' => '',
+            'user[roles]' => 'ROLE_USER'
+        ]);
+        $client->submit($form);
+
+        $this->assertResponseIsSuccessful();
+        //$this->assertSelectorTextContains('??', 'Vous devez saisir un nom d'utilisateur.');
+        //$this->assertSelectorTextContains('??', 'Vous devez saisir une adresse email.');
+    }
+
     public function testCreateAsAdminBadPasswords()
     {
         self::bootKernel();
@@ -212,6 +238,31 @@ class UserControllerTest extends WebTestCase
         $client->submit($form);
         
         $this->assertSelectorTextContains('span', 'Les deux mots de passe doivent correspondre.');
+        
+    }
+
+    public function testCreateAsAdminUserExists()
+    {
+        self::bootKernel();
+        $user = self::$container->get('doctrine')->getManager()->getRepository(User::class)->findOneBy(['username' => 'Admin']);
+        self::ensureKernelShutdown();
+
+        $client = static::createClient();
+
+        $this->loginUser($client, $user);
+
+        $crawler = $client->request('GET', '/users/create');
+
+        $form = $crawler->selectButton('Ajouter')->form([
+            'user[username]' => 'Anonyme',
+            'user[password][first]' => 'test',
+            'user[password][second]' => 'test',
+            'user[email]' => 'anonyme@test.fr',
+            'user[roles]' => 'ROLE_USER'
+        ]);
+        $client->submit($form);
+        
+        $this->assertSelectorTextContains('span', 'This value is already used.');
         
     }
 
@@ -270,7 +321,6 @@ class UserControllerTest extends WebTestCase
 
         $this->assertSelectorTextContains('span', 'Les deux mots de passe doivent correspondre.');
     }
-
 
 
 }
