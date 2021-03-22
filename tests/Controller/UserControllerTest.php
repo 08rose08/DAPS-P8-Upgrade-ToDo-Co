@@ -186,35 +186,12 @@ class UserControllerTest extends WebTestCase
         $client->followRedirect();
         $this->assertResponseIsSuccessful();
         $this->assertSelectorExists('.alert.alert-success');
+        //$this->assertSame(1, $crawler->filter('html:contains("charlie")')->count());
+        //echo $client->html();
         //Dama bloque ? -> fonctionne si Anonyme
         //$this->assertSelectorTextContains('td', 'charlie');
     }
 
-    public function testCreateAsAdminEmptyForm()
-    {
-        self::bootKernel();
-        $user = self::$container->get('doctrine')->getManager()->getRepository(User::class)->findOneBy(['username' => 'Admin']);
-        self::ensureKernelShutdown();
-
-        $client = static::createClient();
-
-        $this->loginUser($client, $user);
-
-        $crawler = $client->request('GET', '/users/create');
-
-        $form = $crawler->selectButton('Ajouter')->form([
-            'user[username]' => '',
-            'user[password][first]' => '',
-            'user[password][second]' => '',
-            'user[email]' => '',
-            'user[roles]' => 'ROLE_USER'
-        ]);
-        $client->submit($form);
-
-        $this->assertResponseIsSuccessful();
-        //$this->assertSelectorTextContains('??', 'Vous devez saisir un nom d'utilisateur.');
-        //$this->assertSelectorTextContains('??', 'Vous devez saisir une adresse email.');
-    }
 
     public function testCreateAsAdminBadPasswords()
     {
@@ -263,6 +240,25 @@ class UserControllerTest extends WebTestCase
         $client->submit($form);
         
         $this->assertSelectorTextContains('span', 'This value is already used.');
+        
+    }
+
+    public function testCreateAsNotLogged()
+    {
+        $client = static::createClient();
+
+        $client->request('POST', '/users/create', [
+            'user[username]' => 'charlie',
+            'user[password][first]' => 'test',
+            'user[password][second]' => 'test',
+            'user[email]' => 'charlie@test.fr',
+            'user[roles]' => 'ROLE_USER'
+        ]);
+
+        $this->assertResponseRedirects();
+        $client->followRedirect();
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorTextContains('button', 'Se connecter');
         
     }
 
@@ -320,6 +316,25 @@ class UserControllerTest extends WebTestCase
         $client->submit($form);
 
         $this->assertSelectorTextContains('span', 'Les deux mots de passe doivent correspondre.');
+    }
+
+    public function testEditAsNotLogged()
+    {
+        $client = static::createClient();
+
+        $client->request('POST', '/users/1/edit', [
+            'user[username]' => 'charlie',
+            'user[password][first]' => 'test',
+            'user[password][second]' => 'test',
+            'user[email]' => 'charlie@test.fr',
+            'user[roles]' => 'ROLE_USER'
+        ]);
+
+        $this->assertResponseRedirects();
+        $client->followRedirect();
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorTextContains('button', 'Se connecter');
+        
     }
 
 
