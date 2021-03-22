@@ -25,7 +25,7 @@ class DefaultControllerTest extends WebTestCase
 
     }
 
-    public function testIndexActionLogged()
+    public function testIndexActionLoggedAsUser()
     {
         
         self::bootKernel();
@@ -38,5 +38,20 @@ class DefaultControllerTest extends WebTestCase
         $client->request('GET', '/');
         $this->assertResponseIsSuccessful();
         $this->assertSelectorTextContains('h1', 'Bienvenue sur Todo List');
+    }
+
+    public function testIndexActionLoggedAsAdmin()
+    {
+        self::bootKernel();
+        $user = self::$container->get(UserRepository::class)->findOneBy(['username' => 'Admin']);
+        self::ensureKernelShutdown();
+
+        $crawler = $client = static::createClient();
+
+        $this->loginUser($client, $user);
+        $crawler = $client->request('GET', '/');
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorTextContains('h1', 'Bienvenue sur Todo List');
+        $this->assertSame(1, $crawler->filter('html:contains("Créer un utilisateur")')->count());
     }
 }

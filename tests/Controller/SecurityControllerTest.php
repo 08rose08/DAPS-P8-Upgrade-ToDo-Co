@@ -74,6 +74,26 @@ class SecurityControllerTest extends WebTestCase
         $this->assertSelectorTextContains('h1', 'Bienvenue sur Todo List');
     }
 
+    public function testLoginWithGoodCredentialsPost()
+    {
+        $client = static::createClient();
+        $client->request('POST', '/login', [
+            '_username' => 'Anonyme',
+            '_password' => 'test'
+        ]);
+
+        // $form = $crawler->selectButton('Se connecter')->form([
+        //     '_username' => 'Anonyme',
+        //     '_password' => 'test'
+        // ]);
+        // $client->submit($form);
+
+        $this->assertResponseRedirects();
+        $client->followRedirect();
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorTextContains('h1', 'Bienvenue sur Todo List');
+    }
+
     public function testLinkLogout()
     {
         self::bootKernel();
