@@ -27,7 +27,7 @@ class AppAuthAuthenticator extends AbstractFormLoginAuthenticator implements Pas
 {
     use TargetPathTrait;
 
-    public const LOGIN_ROUTE = 'app_login';
+    public const LOGIN_ROUTE = 'login';
 
     private $entityManager;
     private $urlGenerator;
@@ -51,8 +51,8 @@ class AppAuthAuthenticator extends AbstractFormLoginAuthenticator implements Pas
     public function getCredentials(Request $request)
     {
         $credentials = [
-            'username' => $request->request->get('username'),
-            'password' => $request->request->get('password'),
+            'username' => $request->request->get('_username'),
+            'password' => $request->request->get('_password'),
             'csrf_token' => $request->request->get('_csrf_token'),
         ];
         $request->getSession()->set(
@@ -74,7 +74,7 @@ class AppAuthAuthenticator extends AbstractFormLoginAuthenticator implements Pas
 
         if (!$user) {
             // fail authentication with a custom error
-            throw new CustomUserMessageAuthenticationException('Username could not be found.');
+            throw new CustomUserMessageAuthenticationException('Zut! Identifiants invalides.');
         }
 
         return $user;
@@ -99,7 +99,7 @@ class AppAuthAuthenticator extends AbstractFormLoginAuthenticator implements Pas
             return new RedirectResponse($targetPath);
         }
 
-         return new RedirectResponse($this->urlGenerator->generate('task_list'));
+         return new RedirectResponse($this->urlGenerator->generate('homepage'));
         // throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);
     }
 
