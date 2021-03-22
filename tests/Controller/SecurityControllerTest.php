@@ -39,6 +39,26 @@ class SecurityControllerTest extends WebTestCase
         $this->assertSelectorTextContains('h1', 'Bienvenue sur Todo List');    
     }  
 
+    public function testLoginWithBadUsername()
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/login');
+
+        $form = $crawler->selectButton('Se connecter')->form([
+            '_username' => 'Lars',
+            '_password' => 'test'
+        ]);
+        $client->submit($form);
+
+        $this->assertResponseRedirects();
+        $crawler = $client->followRedirect();
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorExists('.alert.alert-danger');
+        //$this->assertSelectorTextContains('div', 'Zut! Identifiants invalides.');
+        $this->assertSame(1, $crawler->filter('html:contains("Zut!")')->count());
+        $this->assertSelectorTextContains('button', 'Se connecter');
+    }
+
     public function testLoginWithBadCredentials()
     {
         $client = static::createClient();
@@ -47,6 +67,25 @@ class SecurityControllerTest extends WebTestCase
         $form = $crawler->selectButton('Se connecter')->form([
             '_username' => 'Anonyme',
             '_password' => 'failtest'
+        ]);
+        $client->submit($form);
+
+        $this->assertResponseRedirects();
+        $client->followRedirect();
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorExists('.alert.alert-danger');
+        $this->assertSelectorTextContains('button', 'Se connecter');
+    }
+
+    public function testLoginWithBadCsrfToken()
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/login');
+
+        $form = $crawler->selectButton('Se connecter')->form([
+            '_username' => 'Anonyme',
+            '_password' => 'failtest',
+            '_csrf_token' => 'failToken'
         ]);
         $client->submit($form);
 
@@ -67,32 +106,54 @@ class SecurityControllerTest extends WebTestCase
             '_password' => 'test'
         ]);
         $client->submit($form);
-
+        
         $this->assertResponseRedirects();
-        $client->followRedirect();
+        $crawler = $client->followRedirect();
         $this->assertResponseIsSuccessful();
+        //echo $crawler->html();
         $this->assertSelectorTextContains('h1', 'Bienvenue sur Todo List');
+        //$this->assertSame(1, $crawler->filter('html:contains("Bienvenue")')->count());
     }
 
-    public function testLoginWithGoodCredentialsPost()
+    public function testLoginWithGoodCredentialsFromTasksPath()
     {
         $client = static::createClient();
-        $client->request('POST', '/login', [
+        $client->request('GET', '/tasks');
+        $crawler = $client->followRedirect();
+        $form = $crawler->selectButton('Se connecter')->form([
             '_username' => 'Anonyme',
             '_password' => 'test'
         ]);
-
-        // $form = $crawler->selectButton('Se connecter')->form([
-        //     '_username' => 'Anonyme',
-        //     '_password' => 'test'
-        // ]);
-        // $client->submit($form);
-
+        $client->submit($form);
+        
         $this->assertResponseRedirects();
-        $client->followRedirect();
+        $crawler = $client->followRedirect();
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('h1', 'Bienvenue sur Todo List');
+        //echo $crawler->html();
+        $this->assertSelectorTextContains('h1', 'Liste des tâches');
+        //$this->assertSame(1, $crawler->filter('html:contains("Bienvenue")')->count());
     }
+
+
+    // public function testLoginWithGoodCredentialsPost()
+    // {
+    //     $client = static::createClient();
+    //     $client->request('POST', '/login', [
+    //         '_username' => 'Anonyme',
+    //         '_password' => 'test'
+    //     ]);
+
+    //     // $form = $crawler->selectButton('Se connecter')->form([
+    //     //     '_username' => 'Anonyme',
+    //     //     '_password' => 'test'
+    //     // ]);
+    //     // $client->submit($form);
+
+    //     $this->assertResponseRedirects();
+    //     $client->followRedirect();
+    //     $this->assertResponseIsSuccessful();
+    //     $this->assertSelectorTextContains('h1', 'Bienvenue sur Todo List');
+    // }
 
     public function testLinkLogout()
     {
