@@ -239,8 +239,31 @@ class UserControllerTest extends WebTestCase
         ]);
         $client->submit($form);
         
-        $this->assertSelectorTextContains('span', 'This value is already used.');
+        $this->assertSelectorTextContains('span', 'Ce nom d\'utilisateur existe déjà !'); 
+    }
+
+    public function testCreateAsAdminEmailExists()
+    {
+        self::bootKernel();
+        $user = self::$container->get('doctrine')->getManager()->getRepository(User::class)->findOneBy(['username' => 'Admin']);
+        self::ensureKernelShutdown();
+
+        $client = static::createClient();
+
+        $this->loginUser($client, $user);
+
+        $crawler = $client->request('GET', '/users/create');
+
+        $form = $crawler->selectButton('Ajouter')->form([
+            'user[username]' => 'charlie',
+            'user[password][first]' => 'test',
+            'user[password][second]' => 'test',
+            'user[email]' => 'anonyme@test.fr',
+            'user[roles]' => 'ROLE_USER'
+        ]);
+        $client->submit($form);
         
+        $this->assertSelectorTextContains('span', 'Cet email existe déjà !'); 
     }
 
     public function testCreateAsNotLogged()
